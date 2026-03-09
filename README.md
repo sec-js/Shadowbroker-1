@@ -163,45 +163,29 @@ Open `http://localhost:3000` to view the dashboard! *(Requires Docker)*
 
 ### 🐳 Docker Setup (Recommended for Self-Hosting)
 
-You can run the dashboard easily using the pre-built Docker images hosted on GitHub Container Registry (GHCR).
+The repo includes a `docker-compose.yml` that builds both images locally.
 
-1. Create a `docker-compose.yml` file:
-
-```yaml
-version: '3.8'
-
-services:
-  backend:
-    image: ghcr.io/<your-username>/live-risk-dashboard-backend:main
-    container_name: shadowbroker-backend
-    ports:
-      - "8000:8000"
-    environment:
-      - AIS_API_KEY=${AIS_API_KEY}
-      - OPENSKY_CLIENT_ID=${OPENSKY_CLIENT_ID}
-      - OPENSKY_CLIENT_SECRET=${OPENSKY_CLIENT_SECRET}
-    volumes:
-      - backend_data:/app/data
-    restart: unless-stopped
-
-  frontend:
-    image: ghcr.io/<your-username>/live-risk-dashboard-frontend:main
-    container_name: shadowbroker-frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-volumes:
-  backend_data:
+```bash
+git clone https://github.com/BigBodyCobain/Shadowbroker.git
+cd Shadowbroker
+# Add your API keys (optional — see Environment Variables below)
+cp backend/.env.example backend/.env
+# Build and start
+docker-compose up -d --build
 ```
 
-1. Create a `.env` file in the same directory with your API keys.
-2. Run `docker-compose up -d`.
-3. Access the dashboard at `http://localhost:3000`.
+Open `http://localhost:3000` to view the dashboard.
+
+> **Custom ports or LAN access?** The frontend auto-detects the backend at
+> `<your-hostname>:8000`. If you remap the backend to a different port
+> (e.g. `"9096:8000"`), set `NEXT_PUBLIC_API_URL` before building:
+>
+> ```bash
+> NEXT_PUBLIC_API_URL=http://192.168.1.50:9096 docker-compose up -d --build
+> ```
+>
+> This is a **build-time** variable (Next.js limitation) — it gets baked into
+> the frontend during `npm run build`. Changing it requires a rebuild.
 
 ---
 
@@ -210,7 +194,7 @@ volumes:
 If you just want to run the dashboard without dealing with terminal commands:
 
 1. Go to the **[Releases](../../releases)** tab on the right side of this GitHub page.
-2. Download the `ShadowBroker_v0.3.zip` file.
+2. Download the latest `.zip` file from the release.
 3. Extract the folder to your computer.
 4. **Windows:** Double-click `start.bat`.
    **Mac/Linux:** Open terminal, type `chmod +x start.sh`, and run `./start.sh`.
